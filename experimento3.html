@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>App Estado de Ánimo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh
+    }
+    .container {
+      background: white;
+      padding: 20px 30px;
+      border-radius: 10px;
+      box-shadow: 0px 2px 10px rgba(0,0,0,0.1);
+      width: 350px
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #444
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px
+    }
+    button {
+      background: #5a67d8;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border: none
+    }
+    button:hover {
+      background: #434190
+    }
+    .hidden {
+      display: none
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Pantalla de inicio -->
+    <div id="startScreen">
+      <h2>Bienvenido</h2>
+      <button onclick="showLogin()"> Iniciar Sesión</button>
+      <button onclick="startSurvey()"> Acceder a la Encuesta</button>
+    </div>
+
+    <!-- Pantalla de login -->
+    <div id="loginScreen" class="hidden">
+      <h2>Iniciar Sesión</h2>
+      <input type="text" id="username" placeholder="Usuario">
+      <input type="password" id="password" placeholder="Contraseña">
+      <button onclick="login()">Ingresar</button>
+      <button onclick="backToStart()">⬅ Volver</button>
+    </div>
+
+    <!-- Pantalla de encuesta -->
+    <div id="questionScreen" class="hidden">
+      <h2>Encuesta de Estado de Ánimo</h2>
+      <label>¿Cómo te sientes hoy?</label>
+      <select id="mood">
+        <option value="feliz">😊 Feliz</option>
+        <option value="triste">😢 Triste</option>
+        <option value="estresado">😣 Estresado</option>
+        <option value="enojado">😡 Enojado</option>
+      </select>
+      <label>¿Qué nivel de energía tienes?</label>
+      <select id="energy">
+        <option value="alta">Alta</option>
+        <option value="media">Media</option>
+        <option value="baja">Baja</option>
+      </select>
+      <button onclick="submitAnswers()">Enviar</button>
+    </div>
+
+    <!-- Pantalla de resultado -->
+    <div id="resultScreen" class="hidden">
+      <h2>Resultado</h2>
+      <p id="recommendation"></p>
+      <button onclick="showRegister()">Quiero Registrarme</button>
+      <button onclick="restart()">Volver al inicio</button>
+    </div>
+
+    <!-- Pantalla de registro -->
+    <div id="registerScreen" class="hidden">
+      <h2>Registro</h2>
+      <input type="text" id="newUser" placeholder="Usuario">
+      <input type="password" id="newPass" placeholder="Contraseña">
+      <input type="email" id="newEmail" placeholder="Correo electrónico">
+      <button onclick="register()">Registrarme</button>
+      <button onclick="restart()">Volver al inicio</button>
+    </div>
+
+  </div>
+
+  <script>
+    // 🔹 Usuarios quemados de prueba
+    const usuarios = [
+      { user: "admin", pass: "1234" },
+      { user: "test", pass: "1234" }
+    ];
+
+    function showLogin() {
+      document.getElementById("startScreen").classList.add("hidden")
+      document.getElementById("loginScreen").classList.remove("hidden")
+    }
+
+    function backToStart() {
+      document.getElementById("loginScreen").classList.add("hidden")
+      document.getElementById("startScreen").classList.remove("hidden")
+    }
+
+    function startSurvey() {
+      document.getElementById("startScreen").classList.add("hidden")
+      document.getElementById("questionScreen").classList.remove("hidden")
+    }
+
+    function login() {
+      const user = document.getElementById("username").value
+      const pass = document.getElementById("password").value
+
+      const encontrado = usuarios.find(u => u.user === user && u.pass === pass)
+
+      if (encontrado) {
+        document.getElementById("loginScreen").classList.add("hidden")
+        document.getElementById("questionScreen").classList.remove("hidden")
+      } else {
+        alert("Usuario o contraseña incorrectos")
+      }
+    }
+
+    function submitAnswers() {
+      const mood = document.getElementById("mood").value
+      const energy = document.getElementById("energy").value
+      let recommendation = ""
+
+      if (mood === "feliz" && energy === "alta") {
+        recommendation = "¡Genial! Aprovecha tu energía para avanzar en tus metas."
+      } else if (mood === "triste") {
+        recommendation = "Habla con un amigo o escucha música que te anime."
+      } else if (mood === "estresado") {
+        recommendation = "Haz una pausa, respira profundo y toma un descanso."
+      } else if (mood === "enojado") {
+        recommendation = "Intenta hacer ejercicio o escribir lo que sientes."
+      } else if (energy === "baja") {
+        recommendation = "Tómate un tiempo para descansar y recuperarte."
+      } else {
+        recommendation = "Recuerda que tu bienestar es importante, cuídate."
+      }
+
+      document.getElementById("questionScreen").classList.add("hidden")
+      document.getElementById("resultScreen").classList.remove("hidden")
+      document.getElementById("recommendation").innerText = recommendation
+    }
+
+    function showRegister() {
+      document.getElementById("resultScreen").classList.add("hidden")
+      document.getElementById("registerScreen").classList.remove("hidden")
+    }
+
+    function register() {
+      const user = document.getElementById("newUser").value
+      const pass = document.getElementById("newPass").value
+      const email = document.getElementById("newEmail").value
+
+      if (user && pass && email) {
+        alert("Registro exitoso para: " + user)
+        restart()
+      } else {
+        alert("Por favor completa todos los campos.")
+      }
+    }
+
+    function restart() {
+      document.querySelectorAll(".container > div").forEach(div => div.classList.add("hidden"))
+      document.getElementById("startScreen").classList.remove("hidden")
+
+      // limpiar inputs
+      document.getElementById("username").value = ""
+      document.getElementById("password").value = ""
+      document.getElementById("newUser").value = ""
+      document.getElementById("newPass").value = ""
+      document.getElementById("newEmail").value = ""
+    }
+  </script>
+</body>
+</html>
